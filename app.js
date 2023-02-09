@@ -31,6 +31,34 @@ app.get("/api/v1/people", (req, res) => {
   res.json(people);
 });
 
+
+app.post('/add', ({ body: { a, b }}, res) => {
+  // we will coerce null or undefined inputs to 0
+  if (
+    a === undefined
+    || b === undefined
+    || a === null
+    || b === null
+  ) {
+    res.send({ sum: 0 });
+    return
+  }
+  // we will not accept boolean inputs
+  if (typeof a === 'boolean' || typeof b === 'boolean') {
+    res.status(400).send({ message: 'boolean inputs are unacceptable' });
+    return
+  }
+  // for array inputs, we will sum the array (i.e [1, 2] -> 3)
+  if (a instanceof Array) {
+    a = a.reduce((acc, cur) => acc + cur);
+  }
+  if (b instanceof Array) {
+    b = b.reduce((acc, cur) => acc + cur);
+  }
+
+  res.send({ sum: a + b });
+})
+
 app.get("/api/v1/people/:id", (req, res) => {
   const index = Number(req.params.id);
   if (

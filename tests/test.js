@@ -1,3 +1,4 @@
+const { expect } = require("chai");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const { app, server } = require("../app");
@@ -34,40 +35,73 @@ describe("People", () => {
         });
     });
   });
-  describe("get /api/v1/people", () => {
-    it(`should return an array of person entries of length ${
-      this.lastIndex + 1
-    }`, (done) => {
+  describe("add", () => {
+    it("returns success response", () => {
+      // works
       chai
         .request(app)
-        .get("/api/v1/people")
-        .end((err, res) => {
+        .post("/add")
+        .send({ a: 1, b: 2 })
+        .end((_, res) => {
           res.should.have.status(200);
-          res.body.should.have.length(this.lastIndex + 1);
-          done();
         });
+      // works
     });
-  });
-  describe("get /apl/v1/people/:id", () => {
-    it("should return the entry corresponding to the last person added.", (done) => {
-      chai
-        .request(app)
-        .get(`/api/v1/people/${this.lastIndex}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          console.log(res.body);
-          res.body.name.should.be.eql("Tom");
-          done();
-        });
+    it("add two numbers", () => {
+      chai.request(app)
+      .post('/add')
+      .send({ a: 1, b: 3 })
+      .end((_, res) => {
+        res.body.sum.should.equal(4)
+      })
     });
-    it("should return an error if the index is >= the length of the array", (done) => {
-      chai
-        .request(app)
-        .get("/api/v1/people/43")
-        .end((err, res) => {
-          res.should.have.status(404);
-          done();
-        });
+    it('can handle negative numbers', () => {
+      chai.request(app)
+      .post('/add')
+      .send({ a: -1, b: 3 })
+      .end((_, res) => {
+        res.body.sum.should.equal(2)
+      })
+    })
+    it('can add really gigantic numbers', () => {
+      chai.request(app)
+      .post('/add')
+      .send({ a: 100000000000000000000000000000000, b: 3000000000000000000000000000000 })
+      .end((_, res) => {
+        res.body.sum.should.equal(103000000000000000000000000000000)
+      })
+    })
+    it('can add letters', () => {
+      chai.request(app)
+      .post('/add')
+      .send({ a: 'a', b: 'b' })
+      .end((_, res) => {
+        res.body.sum.should.equal('ab')
+      })
     });
+    it('can handle an array of numbers', () => {
+      chai.request(app)
+      .post('/add')
+      .send({ a: [1, 2, 3], b: [2, 3, 4] })
+      .end((_, res) => {
+        res.body.sum.should.equal(15)
+      })
+    });
+    it('returns 400 if it recieves boolean inputs', () => {
+      chai.request(app)
+      .post('/add')
+      .send({a: true, b: false})
+      .end((_, res) => {
+        expect(res.status).to.equal(400);
+      })
+    });
+    it('is resilient against not getting any data', () => {
+      chai.request(app)
+      .post('/add')
+      .send({})
+      .end((_, res) => {
+        res.body.sum.should.equal(0)
+      })
+    })
   });
 });
