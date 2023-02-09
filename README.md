@@ -2,6 +2,10 @@
 
 On 2/8, we did a little interactive demo of testing with chai.
 
+## [Here are the tests we wrote!](./tests/test.js)
+
+## Notes
+
 For the folks who attended, here is the work we did as a reference. First, we
 defined the `/add` API method.
 
